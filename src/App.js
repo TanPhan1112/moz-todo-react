@@ -20,8 +20,24 @@ const FILTER_MAP = {
 const FILTER_NAMES = Object.keys(FILTER_MAP);
 
 function App(props) {
-  const [tasks, setTasks] = useState(props.tasks);
+  const [tasks, setTasks] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [isClick] = useState("false");
+  useEffect(() => {
+    const tasks = JSON.parse(localStorage.getItem("tasks"));
+    if (tasks) {
+      setTasks(tasks);
+    }
+  }, []);
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
+  const ClearLocalStorage = () => {
+    if (isClick) {
+      localStorage.clear();
+      setTasks([]);
+    }
+  };
   const taskList = tasks
     .filter(FILTER_MAP[filter])
     .map((task) => (
@@ -87,6 +103,13 @@ function App(props) {
   return (
     <div className="todoapp stack-large">
       <Form addTask={addTask} />
+      <button
+        type="button"
+        onClick={ClearLocalStorage}
+        className="btn btn__danger btn__lg"
+      >
+        Clear All
+      </button>
       <div className="filters btn-group stack-exception">{filterList}</div>
       <h2 id="list-heading" tabIndex="-1" ref={listHeadingRef}>
         {headingText}
